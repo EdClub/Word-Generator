@@ -1,0 +1,84 @@
+<html>
+<head>
+	<title>Word Gen</title>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+
+	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.9.3/lodash.min.js"></script>
+	<script src="base.js"></script>
+</head>
+<body>
+<br />
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="well">
+                <div class="form-group">
+                    <label for="include">Must Include</label>
+                    <textarea class="form-control" id="include" placeholder="a, b, c, ^de, geh$"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="tolerate">Optional Characters (* means everything)</label>
+                    <input class="form-control" id="tolerate" placeholder="abcd" value='*' />
+                </div>
+                <div class="form-group">
+                    <label for="from_count"># of Characters</label>
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i>At least</i>
+                            <input type="number" value="0" class="form-control" id="from_count">
+                        </div>
+                        <div class="col-xs-3">
+                            <i>At most</i>
+                            <input type="number" value="50" class="form-control" id="to_count">
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox">
+                    <h4>Choose list: <span id='count'></span></h4>
+                    <label> <input data-filename='all_words.txt' class="word_list" type="checkbox" checked> All word list </label>
+                </div>
+                <div class="checkbox">
+                  <label> <input data-filename='combo.txt' class="word_list" type="checkbox"> Combo List </label>
+                </div>
+                <div class="checkbox">
+                  <label> <input data-filename='grade_k.txt' class="word_list" type="checkbox"> Kindergarten </label>
+                </div>
+                <div class="checkbox">
+                  <label> <input data-filename='grade_1.txt' class="word_list" type="checkbox"> Grade 1 </label>
+                </div>
+                <div class="checkbox">
+                  <label> <input data-filename='grade_2.txt' class="word_list" type="checkbox"> Grade 2 </label>
+                </div>
+                <div class="checkbox">
+                  <label> <input data-filename='grade_3.txt' class="word_list" type="checkbox"> Grade 3 </label>
+                </div>
+                <div class="checkbox">
+                  <label> <input data-filename='grade_4.txt' class="word_list" type="checkbox"> Grade 4 </label>
+                </div>
+                <div class="checkbox">
+                  <label> <input data-filename='grade_5.txt' class="word_list" type="checkbox"> Grade 5 </label>
+                </div>
+                <div class="checkbox">
+                  <label> <input data-filename='long.txt' class="word_list" type="checkbox"> Grade 6 </label>
+                </div>
+                <div class="form-group">
+                    <label for="custom">Custom Word List</label>
+                    <textarea class="form-control" id="custom" placeholder="list of words"></textarea>
+                </div>
+
+                <button class="btn btn-primary" id='gen'>Generate</button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class='well'>
+                <textarea style='height:640px;' class="form-control" id="result"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
