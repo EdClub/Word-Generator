@@ -17,7 +17,9 @@ function load_word_lists(){
   $(filenames).each(function(i, name){
     $.get(name, function(text){
       master_list[name] = text.split('\n');
-      $(".word_list").filter(function() {return $(this).data("filename") == name }).parent().append($("<i />").html('<span class="label label-default">'+numberWithCommas(master_list[name].length)+'</span>'));
+      var count_nd = $("<i />").html('<span class="label label-default">'+numberWithCommas(master_list[name].length)+'</span>');
+      count_nd.stop().hide().delay(Math.random()*700+100).fadeIn('fast');
+      $(".word_list").filter(function() {return $(this).data("filename") == name }).parent().append(count_nd);
       get_count_of_selected();
     });
   });
@@ -95,7 +97,7 @@ function generate_words(query){
     if(is_word_match(word, query))
       new_list.push(word);
   }
-  return new_list;
+  return _.unique(new_list);
 }
 
 $(function(){
@@ -105,6 +107,7 @@ $(function(){
     console.log(query);
     var words = generate_words(query);
     $("#result").val(words.join('\n'));
+    $("#result-count").hide().html(numberWithCommas(words.length) + ' matches').fadeIn('fast');
     return false;
   });  
 })
