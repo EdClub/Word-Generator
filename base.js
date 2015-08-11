@@ -1,3 +1,4 @@
+var neg_words = ["polio", "mm", "hookup", "junky", "kink", "hokum", "hullo", "pinko", "plonk", "kip", "drug", "violent", "so-called", "mm-hmm", "catholic", "butt", "nazi", "damn", "fund-raising", "gi", "prostitution", "buddhist", "best-known", "hebrew", "hepatitis", "vulgar", "ex-husband", "queer"];
 
 
 $(function(){
@@ -57,12 +58,16 @@ function get_form_data(){
 
 function is_word_match(word, query){
   var len = word.length;
+  word = word.toLowerCase();
   var chars = word.split('');
 
   if(len < query.from_count)
     return false;
   
   if(len > query.to_count)
+    return false;
+
+  if(_.indexOf(neg_words, word) != -1)
     return false;
 
   var trimmed_down = word;
@@ -83,7 +88,6 @@ function is_word_match(word, query){
   if(_.difference(left_over_chars, query.tolerate).length)
     return false;
 
-
   return true;
 }
 
@@ -102,7 +106,6 @@ $(function(){
   load_word_lists();
   $("#gen").click(function(){
     var query = get_form_data();
-    console.log(query);
     var words = generate_words(query);
     $("#result").val(words.join('\n'));
     return false;
