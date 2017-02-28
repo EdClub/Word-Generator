@@ -4,8 +4,18 @@
 	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
 	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.9.3/lodash.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
   <script src="base.js"></script>
+  <style>
+    #result {
+      border: solid 1px #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      min-height: 200px;      
+    }
+    #result li {list-style: none; border-bottom: solid 1px #e1e1e1;}
+    #result ul {padding: 0;}
+  </style>
 </head>
 <body>
 
@@ -25,6 +35,60 @@
 <br />
 
 <div class="container">
+  <div class="row">
+    <div class="col-md-7">
+      <div class="form-group row">
+        <label class="col-md-6 col-form-label">Choose Source Corpus</label>
+        <div class="col-md-6">
+          <select id="corpora" class="custom-select"></select>
+        </div>
+      </div>  
+      <div class="form-group row">
+        <label class="col-md-6 col-form-label">Generate text of Length</label>
+        <div class="col-md-6">
+          <input placeholder="200" class="form-control" type="number" id="length"/>
+        </div>
+      </div>  
+      <div class="form-group row">
+        <label class="col-md-6 col-form-label">Only Characters (default all)</label>
+        <div class="col-md-6">
+          <div style="text-align: right; margin-bottom: 2px;">
+            <button class="btn btn-xs" onclick="add_needed_lowercase();">a-z</button>
+            <button class="btn btn-xs" onclick="add_needed_uppercase();">A-Z</button>
+            <button class="btn btn-xs" onclick="add_needed_digits();">0-9</button>
+            <button class="btn btn-xs" onclick="add_needed_punctuation();">!-~</button>
+            <button class="btn btn-xs" onclick="clear_needed();" style="padding: 4px 8px;"> <i class="glyphicon glyphicon-remove"></i></button>
+          </div>
+          <input class="form-control" type="text" id="needed"/>
+        </div>
+      </div>  
+      <div class="form-group row">
+        <label class="col-md-6 col-form-label">
+          Ignore Characters (default none)
+        </label>
+        <div class="col-md-6">
+          <div style="text-align: right; margin-bottom: 2px;">
+            <button class="btn btn-xs" onclick="add_ignored_lowercase();">a-z</button>
+            <button class="btn btn-xs" onclick="add_ignored_uppercase();">A-Z</button>
+            <button class="btn btn-xs" onclick="add_ignored_digits();">0-9</button>
+            <button class="btn btn-xs" onclick="add_ignored_punctuation();">!-~</button>
+            <button class="btn btn-xs" onclick="clear_ignored();" style="padding: 4px 8px;"> <i class="glyphicon glyphicon-remove"></i></button>
+          </div>
+          <input class="form-control" type="text" id="ignore"/>
+        </div>
+      </div>  
+      <div class="form-group row">
+        <label class="col-md-6 col-form-label">Focus Characters (default none)</label>
+        <div class="col-md-6"><input class="form-control" type="text" id="focus"/></div>
+      </div>  
+      <div>
+        <button class="btn btn-primary pull-right" onclick="generate()">Generate</button>
+      </div>  
+    </div>
+    <div class="col-md-5">
+      <div id="result"></div>
+      <div id="result-size" class="text-right"></div>
+    </div>  
 </div>
 
 </body>

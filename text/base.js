@@ -3,153 +3,241 @@
 // import random
 // import math
 
-// MAGIC_SET_SIZE = 20.0   # if the extracted set is less, then random words will be included 
-//                         # inverse-proportionally to how small the set is
-// MAX_WORD_SIZE = 20
-// BREAK_CHARS = '.!?'
+var MAGIC_SET_SIZE = 20.0;   // if the extracted set is less, then random words will be included 
+                        	 // inverse-proportionally to how small the set is
+var MAX_WORD_SIZE = 20;
+var BREAK_CHARS = '.!?';
 
-// # ==================================================================   
-// def generate_lesson(file, length=200, needed='', ignore='', focus=''):
-//     """Random generation of text of given length from a corpus; find some good samples at http://www.gutenberg.org/
+var lowercase = 'abcdefghijklmnopqrstuvwxyz',
+	uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+	punctuation = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~',
+	digits = '0123456789';
+var letters = _.concat(lowercase, uppercase);	
 
-//     Hints on how to help the generator:
-//         - do not use a lot of focus chars or combinations that are very rare (i.e. 'qw')
-//         - use 'ignore' to help the generator skip some of the characters to find larger snipets of text 
+var corpora = {
+	english: ['andersen-books'],
+	french: ['andersen-french-1'],
+	romanian: ['eminescu'],
+	german: ['hans-german'],
+	spanish: ['edgar-poe-spanish']
+}
 
-//     file = name of corpus file
-//     length = desired generated text length
-//     needed = include only these characters; if not specified (include all letters, punctuation and digits)
-//     ignore = if these characters are encountered, just ignore and move to next character
-//     focus = try to find sequences where these characters are more frequent (all focus chars must appear in one snippet)
+window.onload = function() {
+	var $corpora = $("#corpora");
 
-//     - if not enough choices are available, the function will partially generate random words which 
-//     statistically fit the nature of the corpus, in terms of word length and char frequency
-//     """
-//     if not needed:
-//         needed = string.letters + string.punctuation + string.digits
+	var file_list = [];
+	for (var lang in corpora) {
+		var file_list = _.concat(file_list, corpora[lang]);
+	}
+	for (var i in file_list) {
+		$corpora.append("<option>" + file_list[i] + "</option>");
+	}
+}
 
-//     needed = set(needed)
+function add_needed_lowercase() {$("#needed").val($("#needed").val() + lowercase);}
+function add_needed_uppercase() {$("#needed").val($("#needed").val() + uppercase);}
+function add_needed_digits() {$("#needed").val($("#needed").val() + digits);}
+function add_needed_punctuation() {$("#needed").val($("#needed").val() + punctuation);}
+function clear_needed() {$("#needed").val("");}
+function add_ignored_lowercase() {$("#ignore").val($("#ignore").val() + lowercase);}
+function add_ignored_uppercase() {$("#ignore").val($("#ignore").val() + uppercase);}
+function add_ignored_digits() {$("#ignore").val($("#ignore").val() + digits);}
+function add_ignored_punctuation() {$("#ignore").val($("#ignore").val() + punctuation);}
+function clear_ignored() {$("#ignore").val("");}
 
-//     needed_words = {}
-//     wlen_hist = [0 for _ in range(0, MAX_WORD_SIZE)]
-//     char_hist = {c: 0 for c in needed}
+// ==================================================================   
+function generate_lesson(corpus, length=200, needed, ignore='', focus='') {
+    /* Random generation of text of given length from a corpus; find some good samples at http://www.gutenberg.org/
 
-//     content = ''
+    Hints on how to help the generator:
+        - do not use a lot of focus chars or combinations that are very rare (i.e. 'qw')
+        - use 'ignore' to help the generator skip some of the characters to find larger snipets of text 
+
+    file = name of corpus file
+    length = desired generated text length
+    needed = include only these characters; if not specified (include all letters, punctuation and digits)
+    ignore = if these characters are encountered, just ignore and move to next character
+    focus = try to find sequences where these characters are more frequent (all focus chars must appear in one snippet)
+
+    - if not enough choices are available, the function will partially generate random words which 
+    statistically fit the nature of the corpus, in terms of word length and char frequency
+    */
+
+    if (!needed) needed = letters + punctuation + digits;
+
+    needed = new Set(needed);
+
+    needed_words = {};
+    wlen_hist = _.fill(new Array(MAX_WORD_SIZE), 0);
+
+    var char_hist = {};
+    for (var c of needed) char_hist[c] = 0;
+
+    // no need to keep track of the new line characters
+	// console.log(corpus.split("\n")[2]);
+
 //     with open(file) as f:
 //         content = f.read()
 
-//     needed_str = ''
-//     spacing = True
-//     word_len = 0
-//     prev_c = ''
-//     same_c_count = 0
+	var needed_str = '', spacing = true, word_len = 0, prev_c = '', same_c_count = 0;
 
-//     for c in content:
-//         if c == prev_c:
-//             if same_c_count == 3:
-//                 continue
-//             same_c_count += 1
-//         else:
-//             prev_c = c
-//             same_c_count = 0
+	log_progress("<i>Loading corpus...</i>");
 
-//         if c.isspace():
-//             if not spacing:
-//                 #save the length in the histogram
-//                 if word_len < MAX_WORD_SIZE:
-//                     wlen_hist[word_len] += 1
-            
-//             if needed_str:
-//                 can_break = spacing or (c in BREAK_CHARS)
-//                 should_break = len(needed_str) > length or calc_focus_ratio(needed_str, focus) < 0.15
-//                 if (len(needed_str) > length/5 and can_break) or should_break:
-//                     weight_and_add(needed_words, needed_str, focus)
-//                     needed_str = ''
-//             spacing = True
-//             word_len = 0
-//             continue
+    for (var i in corpus) {
+    	var c = corpus[i];
 
-//         if c in ignore:
-//             continue
+        if (c == prev_c) {
+            if (same_c_count == 3) continue;
+            same_c_count++;
+        } else {
+            prev_c = c
+            same_c_count = 0
+        }
+        if (/\s/.test(c)) {
+        	if (!spacing) {
+        		// save the length in the histogram
+                if (word_len < MAX_WORD_SIZE) wlen_hist[word_len]++;
+        	}
+			if (needed_str) {
+				can_break = spacing || (BREAK_CHARS.indexOf(c)>=0);
+				should_break = (needed_str.length > length) || (calc_focus_ratio(needed_str, focus) < 0.15);
+				if ((needed_str > length/5 && can_break) || should_break) {
+					weight_and_add(needed_words, needed_str, focus);
+					needed_str = '';
+				}
+			}            
+            spacing = true;
+            word_len = 0;
+            continue;
+		}
 
-//         if c in char_hist:
-//             char_hist[c] += 1
+        if (ignore.indexOf(c) >= 0) continue;
 
-//         if needed_str or spacing:
-//             needed_str = check_and_add(needed_words, needed_str, c, char_hist, spacing, focus)
-//         spacing = False
-//         word_len += 1
+        if (c in char_hist) char_hist[c]++;
 
-//     # prepare sets for random generation
-//     needed_words = [(c, h) for c, h in needed_words.items()]
-//     wlen_hist = list(enumerate(wlen_hist))
-//     char_hist = [(c,math.log(h)) for c, h in char_hist.items() if h]
+        if (needed_str || spacing) 
+        	needed_str = check_and_add(needed_words, needed_str, c , char_hist, spacing, focus)
 
-//     word_chance = min(1.0, len(needed_words)/MAGIC_SET_SIZE)
+        spacing = false;
+        word_len++;
+	}
 
-//     lesson = []
-//     lesson_len = 0
-//     while lesson_len < length:
-//         if random.random() < word_chance:
-//             next_string = weighted_choice(needed_words)
-//         else:
-//             # must generate a random word-like string
-//             next_string = ""
-//             wlen = weighted_choice(wlen_hist)
-//             for _ in range(wlen):
-//                 next_string += weighted_choice(char_hist)
-//         lesson.append(next_string)
-//         lesson_len += len(next_string)
+    // prepare sets for random generation
+    needed_words = _.toPairs(needed_words);
+    wlen_hist = _.toPairs(wlen_hist); // pair each item with its index
 
-//     return lesson
+    char_hist_list = [];
+    for (var c in char_hist) char_hist_list.push([c, Math.log(char_hist[c])]);
+    char_hist = char_hist_list;
+
+	word_chance = Math.min(1, needed_words.length/MAGIC_SET_SIZE);
+
+	var lesson = [], lesson_len = 0;
+
+	function keepGenerating() {
+		if (lesson_len >= length) {
+			log_progress("<ul>" + lesson.map(function(text) {
+				return "<li>" + text + "</li>";
+			}).join("") + "</ul>");
+			$("#result-size").html(lesson_len);
+			return
+		}
+		if (Math.random() < word_chance) next_string = weighted_choice(needed_words);
+		else {
+			// must generate a random word-like string
+			next_string = "";
+			wlen = weighted_choice(wlen_hist);
+			for (var i in _.range(wlen)) next_string += weighted_choice(char_hist);
+		}
+		lesson.push(next_string);
+		lesson_len += next_string.length;
+		log_progress("<i>Generating text ..." + lesson_len + "/" + length + "</i>");;
+		setTimeout(keepGenerating);
+	}
+	setTimeout(keepGenerating);
+}
+
+function log_progress(log) {
+	$("#result").html(log);
+}
 
 // # ==================================================================   
-// def calc_focus_ratio(str, focus):
-//     if not focus:
-//         return 1
+function calc_focus_ratio(str, focus) {
+	if (!focus) return 1;
 
-//     accumulated_ratio = 0
-//     n = len(str) * 1.0
-//     for c in focus:
-//         if c not in str:
-//             return 0
-//         accumulated_ratio += str.count(c) / n
-//     return accumulated_ratio / len(focus)
+	var accumulated_ratio = 0, n = str.length;
 
-// def weight_and_add(set_words, str, focus):
-//     if focus:
-//         focus_ratio = calc_focus_ratio(str, focus)
-//         if focus_ratio: 
-//             set_words[str] = focus_ratio * len(str)
-//     else:
-//         set_words[str] = len(str)
+	for (var i in focus) {
+		var c = focus[i];
+		if (str.indexOf(c)<0) return 0;
+		accumulated_ratio += str.split(c).length - 1; //count the c's in str
+	}
+	return accumulated_ratio / focus.length;
+}
 
-// def check_and_add(set_words, str, c, set_chars, spacing, focus):
-//     if c in set_chars:
-//         if spacing and str:
-//             str += " "
-//         str += c
-//     else:
-//         while str and not c.isspace() and not c in string.punctuation:
-//             c = str[-1]
-//             str = str[:-1]
-//         str = str.strip()
-//         if str:
-//             weight_and_add(set_words, str, focus)
-//             str = ''
-//     return str
+function weight_and_add(set_words, str, focus) {
+	if (focus) {
+		focus_ratio = calc_focus_ratio(str, focus);
+		if (focus_ratio) set_words[str] = focus_ratio * str.length;
+	} else {
+		set_words[str] = str.length;
+	}
+}
 
-// def weighted_choice(choices):
-//    total = sum(w for c, w in choices)
-//    r = random.uniform(0, total)
-//    upto = 0
-//    for c, w in choices:
-//       if upto + w >= r:
-//          return c
-//       upto += w
-//    assert False, "Shouldn't get here"
+function check_and_add(set_words, str, c, set_chars, spacing, focus) {
+	if (c in set_chars) {
+		if (spacing && str.length) str += " ";
+		str += c
+	} else {
+		while (str.length && !/\s/.test(c) && punctuation.indexOf(c) < 0) {
+			c = str[str.length - 1];
+			str = str.substr(0, str.length - 1);
+		}
+		str = str.trim();
+		if (str.length > 0) {
+			weight_and_add(set_words, str, focus);
+			str = "";
+		}
+	}
+	return str;
+}
 
+function weighted_choice(choices) {
+	var total = 0;
+	for (var i in choices) total += choices[i][1];
+	var r = Math.random() * total;
+	var upto = 0;
+	for (i in choices) {
+		var w = choices[i][1];
+		if (upto + w >= r) return choices[i][0];
+		upto += w;
+	}
+	throw("Should't get here");
+}
 
+var loaded_file;
+var $content;
+
+function generate() {
+	var file = "corpora/" + $("#corpora").val();
+
+	function onCorpusLoaded() {
+		loaded_file = file;
+
+		var length = parseInt($("#length").val()),
+			needed = $("#needed").val(), 
+			ignore = $("#ignore").val(), 
+			focus = $("#focus").val();
+
+		if (isNaN(length)) length = 200;
+		generate_lesson($content.text(), length, needed, ignore, focus);
+	}
+
+	if (loaded_file != file) {
+		$content = $("<div/>");	
+	    $content.load(file, onCorpusLoaded);
+	} else onCorpusLoaded();
+}
 
 // if __name__ == "__main__":
 //     filename, length, chars, ignore, focus = open('input.txt').read().split('\n')
