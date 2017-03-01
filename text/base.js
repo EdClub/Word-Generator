@@ -12,14 +12,14 @@ var lowercase = 'abcdefghijklmnopqrstuvwxyz',
 	uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
 	punctuation = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~',
 	digits = '0123456789';
-var letters = _.concat(lowercase, uppercase);	
+var letters = _.concat(lowercase, uppercase);
 
 var corpora = {
 	english: ['andersen-books'],
 	french: ['andersen-french-1'],
 	romanian: ['eminescu'],
 	german: ['hans-german'],
-	spanish: ['edgar-poe-spanish']
+	spanish: ['edgar-poe-spanish', 'manual-de-economia-politica']
 }
 
 window.onload = function() {
@@ -64,6 +64,7 @@ function generate_lesson(corpus, length=200, needed, ignore='', focus='') {
     */
 
     if (!needed) needed = letters + punctuation + digits;
+    needed = needed + $("#extended").val().trim();
 
     needed = new Set(needed);
 
