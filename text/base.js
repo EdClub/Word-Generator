@@ -240,6 +240,36 @@ function generate() {
 	} else onCorpusLoaded();
 }
 
+function extract() {
+	var substrings = $("#substrings").val().split(/\s+/);
+	if (substrings[0].length < 2) return;
+
+	var file = "corpora/" + $("#corpora").val();
+	function onCorpusLoaded() {
+        loaded_file = file;
+        var corpus = $content.text().toLowerCase();
+		var corpus_words = corpus.split(/[.?!,;\s+*\(\'\"\)\-]/);
+		var filtered_words = _.filter(corpus_words, function(word) {
+			var words_with_substring = _.filter(substrings, function(s) {return word.indexOf(s)>-1;})
+			return words_with_substring.length > 0;
+		});
+		var counted_words = _.countBy(filtered_words);
+		var frequencies = _.map(counted_words, function(count, word) {
+			return {word: word, count: count};
+		});
+		var sorted_frequencies = frequencies.sort(function(a, b) {return b.count-a.count;});
+		var output = [];
+		sorted_frequencies.forEach(function(item) {output.push(item.word + "<span style='float: right'>" + item.count + "</span>")});
+
+		$("#result").html("<ul><li>" + output.join("<li></li>") +"</li></ul>");
+    }
+
+	if (loaded_file != file) {
+		$content = $("<div/>");
+	    $content.load(file, onCorpusLoaded);
+	} else onCorpusLoaded();
+}
+
 // if __name__ == "__main__":
 //     filename, length, chars, ignore, focus = open('input.txt').read().split('\n')
 //     res = generate_lesson(filename, length=int(length), needed=chars, ignore=ignore, focus=focus)

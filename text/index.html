@@ -42,53 +42,80 @@
         <div class="col-md-6">
           <select id="corpora" class="custom-select"></select>
         </div>
-      </div>  
-      <div class="form-group row">
-        <label class="col-md-6 col-form-label">Generate text of Length</label>
-        <div class="col-md-6">
-          <input placeholder="200" class="form-control" type="number" id="length"/>
-        </div>
-      </div>  
-      <div class="form-group row">
-        <label class="col-md-6 col-form-label">Only Characters (default all)</label>
-        <div class="col-md-6">
-          <div style="text-align: right; margin-bottom: 2px;">
-            <button class="btn btn-xs" onclick="add_needed_lowercase();">a-z</button>
-            <button class="btn btn-xs" onclick="add_needed_uppercase();">A-Z</button>
-            <button class="btn btn-xs" onclick="add_needed_digits();">0-9</button>
-            <button class="btn btn-xs" onclick="add_needed_punctuation();">!-~</button>
-            <button class="btn btn-xs" onclick="clear_needed();" style="padding: 4px 8px;"> <i class="glyphicon glyphicon-remove"></i></button>
+      </div>
+
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#text" role="tab" data-toggle="tab">Generate Text</a></li>
+        <li><a href="#words" role="tab" data-toggle="tab">Most Common Words</a></li>
+      </ul>
+      <br/>
+
+      <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="text">
+
+          <div class="form-group row">
+            <label class="col-md-6 col-form-label">Generate text of Length</label>
+            <div class="col-md-6">
+              <input placeholder="200" class="form-control" type="number" id="length"/>
+            </div>
           </div>
-          <input class="form-control" type="text" id="needed"/>
-        </div>
-      </div>  
-      <div class="form-group row">
-        <label class="col-md-6 col-form-label">
-          Ignore Characters (default none)
-        </label>
-        <div class="col-md-6">
-          <div style="text-align: right; margin-bottom: 2px;">
-            <button class="btn btn-xs" onclick="add_ignored_lowercase();">a-z</button>
-            <button class="btn btn-xs" onclick="add_ignored_uppercase();">A-Z</button>
-            <button class="btn btn-xs" onclick="add_ignored_digits();">0-9</button>
-            <button class="btn btn-xs" onclick="add_ignored_punctuation();">!-~</button>
-            <button class="btn btn-xs" onclick="clear_ignored();" style="padding: 4px 8px;"> <i class="glyphicon glyphicon-remove"></i></button>
+          <div class="form-group row">
+            <label class="col-md-6 col-form-label">Only Characters (default all)</label>
+            <div class="col-md-6">
+              <div style="text-align: right; margin-bottom: 2px;">
+                <button class="btn btn-xs" onclick="add_needed_lowercase();">a-z</button>
+                <button class="btn btn-xs" onclick="add_needed_uppercase();">A-Z</button>
+                <button class="btn btn-xs" onclick="add_needed_digits();">0-9</button>
+                <button class="btn btn-xs" onclick="add_needed_punctuation();">!-~</button>
+                <button class="btn btn-xs" onclick="clear_needed();" style="padding: 4px 8px;"> <i class="glyphicon glyphicon-remove"></i></button>
+              </div>
+              <input class="form-control" type="text" id="needed"/>
+            </div>
           </div>
-          <input class="form-control" type="text" id="ignore"/>
+          <div class="form-group row">
+            <label class="col-md-6 col-form-label">
+              Ignore Characters (default none)
+            </label>
+            <div class="col-md-6">
+              <div style="text-align: right; margin-bottom: 2px;">
+                <button class="btn btn-xs" onclick="add_ignored_lowercase();">a-z</button>
+                <button class="btn btn-xs" onclick="add_ignored_uppercase();">A-Z</button>
+                <button class="btn btn-xs" onclick="add_ignored_digits();">0-9</button>
+                <button class="btn btn-xs" onclick="add_ignored_punctuation();">!-~</button>
+                <button class="btn btn-xs" onclick="clear_ignored();" style="padding: 4px 8px;"> <i class="glyphicon glyphicon-remove"></i></button>
+              </div>
+              <input class="form-control" type="text" id="ignore"/>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-md-6 col-form-label">Focus Characters (default none)</label>
+            <div class="col-md-6"><input class="form-control" type="text" id="focus"/></div>
+          </div>
+          <div class="form-group row">
+            <label class="col-md-6 col-form-label">Extend the needed characters with the following extra set</label>
+            <div class="col-md-6"><input class="form-control" value="èùìòàéúíóáëüïÿöäêûîôâõãñ" type="text" id="extended"/></div>
+          </div>
+
+          <div>
+            <button class="btn btn-primary pull-right" onclick="generate()">Generate</button>
+          </div>
         </div>
-      </div>  
-      <div class="form-group row">
-        <label class="col-md-6 col-form-label">Focus Characters (default none)</label>
-        <div class="col-md-6"><input class="form-control" type="text" id="focus"/></div>
-      </div>  
-      <div class="form-group row">
-        <label class="col-md-6 col-form-label">Extend the needed characters with the following extra set</label>
-        <div class="col-md-6"><input class="form-control" value="èùìòàéúíóáëüïÿöäêûîôâõãñ" type="text" id="extended"/></div>
-      </div>        
-      <div>
-        <button class="btn btn-primary pull-right" onclick="generate()">Generate</button>
-      </div>  
+
+        <div role="tabpanel" class="tab-pane" id="words" >
+          <div class="form-group row">
+            <label class="col-md-6 col-form-label">Extract most common words with substrings</label>
+            <div class="col-md-6">
+              <input placeholder="one or more substrings" class="form-control" id="substrings"/>
+            </div>
+          </div>
+
+          <div>
+            <button class="btn btn-primary pull-right" onclick="extract()">Extract</button>
+          </div>
+        </div>
+      </div>
     </div>
+
     <div class="col-md-5">
       <div id="result"></div>
       <div id="result-size" class="text-right"></div>
